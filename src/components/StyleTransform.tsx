@@ -12,10 +12,14 @@ export const StyleTransform = () => {
   const [pxScale, setPxScale] = useState('2');
   // 是否转换img字符串
   const [isTransformImg, setIsTransformImg] = useState(true);
+  // 是否转换css计算单位值
+  const [isTransformCalcCss, setIsTransformCalcCss] = useState(true);
+
   const clipboardObj = navigator.clipboard;
   // 匹配 rem单位或者px单位的正则
   const reg = /(?:(?:\d*\.)?\d+rem|\d+px)/g;
-  // const reg = /(\d+\.?\d*)(rem|px)/g;
+  // 匹配小数除法运算表达式正则
+  const regCalc = /\d+\.?\d*\/\d+\.?\d*/g;
   // 匹配 img字符串
   const imgReg = /img/g;
   const handleChange = (e: any) => {
@@ -23,17 +27,23 @@ export const StyleTransform = () => {
     setInputValue(inputValue);
     setTransformStyleOutputValue(inputValue)
   };
-  const setTransformStyleOutputValue = (inputValue:string) => {
+  const setTransformStyleOutputValue = (inputValue: string) => {
+    let output = inputValue;
+    if(isTransformCalcCss){
+      output = inputValue.replaceAll(regCalc, (match: string) => {
+        let [num1, num2] = match.split('/');
+        return (Number(num1) / Number(num2)).toFixed(2);
+      });
+    }
     // @ts-ignore
-    let output = inputValue.replace(reg,  (match: string, $1: string, $2: string) => {
-      if(match.startsWith('.')){
+    output = output.replace(reg, (match: string, $1: string, $2: string) => {
+      if (match.startsWith('.')) {
         match = '0' + match;
       }
       let num = parseFloat(match);
       if (num === 0) return 0;
       if (match.includes('rem')) {
         num = num * +remScale || 100
-        console.log(num)
 
       }
       if (match.includes('px')) {
@@ -41,11 +51,13 @@ export const StyleTransform = () => {
       }
       return Math.round(num) + 'rpx';
     })
-    if(isTransformImg){
+    if (isTransformImg) {
       output = output.replace(imgReg, (match: string) => {
         return '.image';
       });
     }
+    console.log(output)
+
     setOutputValue(output);
   };
   const handleCopy = () => {
@@ -56,20 +68,32 @@ export const StyleTransform = () => {
 
   useEffect(() => {
     setTransformStyleOutputValue(inputValue);
-  },[isTransformImg, remScale, pxScale]);
+  }, [isTransformImg, remScale, pxScale]);
 
   return (
     <div>
-      <h2>将rem和px单位转换为响应式的rpx单位</h2>
-      <div className="flex items-center justify-between" style={{width: '50vw', margin: "auto"}}>
-        <span>
-          是否替换img选择器为类名image
+      <h2>将rem和px单位转换为响应式的rpx单位!</h2>
+      <div className="flex items-center justify-center">
+          <span className="px-4">
+          是否添加image类名?
+          </span>
+        <Switch
+          className="ml-2"
+          onChange={checked => setIsTransformCalcCss(checked)}
+          checked={isTransformCalcCss} checkedChildren="开启"
+          unCheckedChildren="关闭"
+        />
+        <span className="px-4">
+          是否转换类似计算单位 1/2rem?
         </span>
         <Switch
+          className="ml-2"
           onChange={checked => setIsTransformImg(checked)}
           checked={isTransformImg} checkedChildren="开启"
           unCheckedChildren="关闭"
         />
+      </div>
+      <div className="flex items-center justify-between pt-4" style={{width: '50vw', margin: "auto"}}>
         <Input
           style={{width: '30%'}}
           onChange={(e) => setRemScale(e.target.value)}
