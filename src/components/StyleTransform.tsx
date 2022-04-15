@@ -1,5 +1,8 @@
 import {useEffect, useState} from "react";
 import {Input, Button, message, Switch} from 'antd';
+import CodeMirror from '@uiw/react-codemirror';
+import {css} from '@codemirror/lang-css';
+import { oneDark } from '@codemirror/theme-one-dark';
 
 const {TextArea} = Input;
 
@@ -22,10 +25,9 @@ export const StyleTransform = () => {
   const regCalc = /\d+\.?\d*\/\d+\.?\d*/g;
   // 匹配 img字符串
   const imgReg = /img/g;
-  const handleChange = (e: any) => {
-    let inputValue = e.target.value;
-    setInputValue(inputValue);
-    setTransformStyleOutputValue(inputValue)
+  const handleChange = (value:string) => {
+    setInputValue(value);
+    setTransformStyleOutputValue(value)
   };
   const setTransformStyleOutputValue = (inputValue: string) => {
     let output = inputValue;
@@ -103,12 +105,23 @@ export const StyleTransform = () => {
           onChange={(e) => setPxScale(e.target.value)}
           value={pxScale} placeholder="请输入px单位转换比例大小"/>
       </div>
-      <TextArea
-        style={{height: '300px', marginTop: '10px'}} value={inputValue}
-        onChange={handleChange}/>
+      <CodeMirror
+        value={inputValue}
+        height="400px"
+        style={{marginTop:'20px'}}
+        theme={oneDark}
+        extensions={[css()]}
+        onChange={handleChange}
+      />
       <div>
         <Button className="my-4" onClick={handleCopy}>复制结果</Button>
-        <TextArea style={{height: '400px'}} value={outputValue}/>
+        <CodeMirror
+          style={{height: '400px'}}
+          value={outputValue}
+          height="400px"
+          theme={oneDark}
+          extensions={[css()]}
+        />
       </div>
     </div>
   )

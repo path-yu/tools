@@ -8,6 +8,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons": "^4.7.0",
+    "@codemirror/lang-css": "^0.19.3",
+    "@codemirror/lang-html": "^0.19.4",
+    "@codemirror/theme-one-dark": "^0.19.1",
+    "@uiw/react-codemirror": "^4.6.0",
     "antd": "^4.19.5",
     "normalize.css": "^8.0.1",
     "react": "^17.0.2",
