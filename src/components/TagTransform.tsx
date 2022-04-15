@@ -14,8 +14,6 @@ export const TagTransform = () => {
   // 匹配<img />标签中所有属性和指令
   const imgReg = /(img\s*[^>]*\s*\/?>)/g;
   // 是否给图片添加image类名
-  // 匹配多行注释或单行注释
-  const commentReg = /(\/\*[\s\S]*?\*\/|\/\/.*)/g;
   const [isAddImageClass, setIsAddImageClass] = useState(true);
   const [inputValue, setInputValue] = useState('');
   const [result, setResult] = useState('');
@@ -32,11 +30,6 @@ export const TagTransform = () => {
     output = output.replace(textReg, 'text');
     // @ts-ignore
     output = output.replace(imgReg, (match: string, attr: string) => {
-      // 如果为注释则不替换
-      if (commentReg.test(match)) {
-        return match;
-      }
-
       attr = attr.replace(/img/, 'image');
       // 如果需要给图片添加image类名, 如果本身有class属性, 则拼接到class属性中, 如果没有class属性, 则添加class属性
       if (isAddClass) {
