@@ -3,7 +3,8 @@ import {Button, Input, message, Switch} from "antd";
 import CodeMirror from '@uiw/react-codemirror';
 import {html} from '@codemirror/lang-html';
 import { oneDark } from '@codemirror/theme-one-dark';
-
+import prettier from 'prettier/standalone';
+import parserHtml from  'prettier/parser-html';
 export const TagTransform = () => {
   // 匹配div或li或ui字符串
   const tag = /div|li|ul/g;
@@ -35,7 +36,7 @@ export const TagTransform = () => {
       if (commentReg.test(match)) {
         return match;
       }
-      
+
       attr = attr.replace(/img/, 'image');
       // 如果需要给图片添加image类名, 如果本身有class属性, 则拼接到class属性中, 如果没有class属性, 则添加class属性
       if (isAddClass) {
@@ -47,7 +48,13 @@ export const TagTransform = () => {
       }
       return attr;
     });
-
+    // 格式化html代码
+    output = prettier.format(output, {
+      parser: 'html',
+      plugins: [
+        parserHtml
+       ]
+    });
     setResult(output)
   }
   const handleCopy = () => {

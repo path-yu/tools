@@ -3,9 +3,8 @@ import {Input, Button, message, Switch} from 'antd';
 import CodeMirror from '@uiw/react-codemirror';
 import {css} from '@codemirror/lang-css';
 import { oneDark } from '@codemirror/theme-one-dark';
-
-const {TextArea} = Input;
-
+import prettier from 'prettier/standalone';
+import cssParser from 'prettier/parser-postcss';
 export const StyleTransform = () => {
   const [inputValue, setInputValue] = useState('');
   const [outputValue, setOutputValue] = useState('');
@@ -58,8 +57,11 @@ export const StyleTransform = () => {
         return '.image';
       });
     }
-    console.log(output)
-
+    //使用prettier格式化less代码
+    output = prettier.format(output, {
+      parser: 'css',
+      plugins: [cssParser]
+    });
     setOutputValue(output);
   };
   const handleCopy = () => {
