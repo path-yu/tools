@@ -2,32 +2,37 @@ import {useEffect, useState} from "react";
 import {Button, Input, message, Switch} from "antd";
 import CodeMirror from '@uiw/react-codemirror';
 import {html} from '@codemirror/lang-html';
-import { oneDark } from '@codemirror/theme-one-dark';
+import {oneDark} from '@codemirror/theme-one-dark';
 import prettier from 'prettier/standalone';
-import parserHtml from  'prettier/parser-html';
+import parserHtml from 'prettier/parser-html';
+import {replaceTag} from "../tools";
+
 export const TagTransform = () => {
-  // 匹配div或li或ui字符串
-  const tag = /div|li|ul/g;
   // 匹配p字符串和span字符串
   const textReg = /(p|span)/g;
-  // 匹配img字符串
+  // 匹配文本标签位置
+  const pOrSpanReg = /(<p.*>|<\/p.>|<span.*>|<\/span>)/g;
   // 匹配<img />标签中所有属性和指令
   const imgReg = /(img\s*[^>]*\s*\/?>)/g;
+  //
   // 是否给图片添加image类名
   const [isAddImageClass, setIsAddImageClass] = useState(true);
   const [inputValue, setInputValue] = useState('');
   const [result, setResult] = useState('');
   const clipboardObj = navigator.clipboard;
+  const divReg = /(<div.*>|<\/div>|<ul.*>|<\/ul>|<li.*>|<\/li>)/g;
+  // 匹配li或者ul或者div字符串
+  const liReg = /(li|div|ul)/;
 
-  const handleChange = (value:string) => {
+  const handleChange = (value: string) => {
     setInputValue(value)
-    setTransformResultValue(value,isAddImageClass)
+    setTransformResultValue(value, isAddImageClass)
   }
 
-  const setTransformResultValue = (value:string,isAddClass:boolean) => {
-    // 替换所有div标签为view标签, 所有的p标签或者span标签为text标签
-    let output = value.replace(tag, 'view');
-    output = output.replace(textReg, 'text');
+  const setTransformResultValue = (value: string, isAddClass: boolean) => {
+    //将div,ul,li标签名替换为view,其他保持不变
+    let output = replaceTag(value, divReg,liReg, 'view');
+    output = replaceTag(output, pOrSpanReg,textReg, 'text');
     // @ts-ignore
     output = output.replace(imgReg, (match: string, attr: string) => {
       attr = attr.replace(/img/, 'image');
@@ -48,6 +53,7 @@ export const TagTransform = () => {
         parserHtml
        ]
     });
+    console.log(output);
     setResult(output)
   }
   const handleCopy = () => {
@@ -58,7 +64,7 @@ export const TagTransform = () => {
 
   const handleSwitch = (checked: boolean) => {
     setIsAddImageClass(checked)
-    setTransformResultValue(inputValue,checked)
+    setTransformResultValue(inputValue, checked)
   }
   return <div>
     <h2>转换html标签</h2>
@@ -75,7 +81,7 @@ export const TagTransform = () => {
     <CodeMirror
       value={inputValue}
       height="400px"
-      style={{marginTop:'20px'}}
+      style={{marginTop: '20px'}}
       theme={oneDark}
       extensions={[html()]}
       onChange={handleChange}
@@ -85,7 +91,7 @@ export const TagTransform = () => {
       <CodeMirror
         value={result}
         height="400px"
-        style={{marginTop:'20px'}}
+        style={{marginTop: '20px'}}
         theme={oneDark}
         extensions={[html()]}
       />
