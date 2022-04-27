@@ -18,8 +18,7 @@ export const StyleTransform = () => {
   const [isTransformCalcCss, setIsTransformCalcCss] = useState(true);
   // 是否删除注释代码
   const [removeCommentChecked, setRemoveCommentChecked] = useState(true);
-  // 对话框是否显示
-  const [isShowModal, setIsShowModal] = useState(false);
+
   const clipboardObj = navigator.clipboard;
   // 匹配 rem单位或者px单位的正则
   const reg = /(?:(?:\d*\.)?\d+rem|\d+px)/g;
@@ -29,8 +28,7 @@ export const StyleTransform = () => {
   const regComment = /\/\*[\s\S]*?\*\//g;
   // 匹配单行注释正则
   const regSingleComment = /\/\/.*/g;
-  // 当前所有自定义规则列表
-  const [ruleList, setRuleList] = useState([]);
+  
   const handleChange = (value: string) => {
     setInputValue(value);
     setTransformStyleOutputValue(value);

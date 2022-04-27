@@ -1,29 +1,26 @@
 import { useState } from "react";
-import { Button, message, Space, Switch } from "antd";
+import { Button, message, Space } from "antd";
 import CodeMirror from "@uiw/react-codemirror";
 import { html } from "@codemirror/lang-html";
 import { oneDark } from "@codemirror/theme-one-dark";
 import prettier from "prettier/standalone";
 import parserHtml from "prettier/parser-html";
-import { replaceTag } from "../tools";
 
 export const TagTransform = () => {
   // 匹配p字符串和span字符串
   const textReg = /(p|span)/g;
-  const [isAddImageClass, setIsAddImageClass] = useState(true);
   const [inputValue, setInputValue] = useState("");
   const [result, setResult] = useState("");
   const clipboardObj = navigator.clipboard;
-  // /是否删除注释代码
-  const [removeCommentChecked, setRemoveCommentChecked] = useState(true);
+
   // 匹配li或者ul或者div字符串
   const divReg = /(li|div|ul)/g;
   const handleChange = (value: string) => {
     setInputValue(value);
-    setTransformResultValue(value, isAddImageClass);
+    setTransformResultValue(value);
   };
 
-  const setTransformResultValue = (value: string, isAddClass: boolean) => {
+  const setTransformResultValue = (value: string) => {
     //将div,ul,li标签名替换为view,其他保持不变
     let output = value.replace(divReg, "view").replace(textReg, "text");
     // 格式化html代码

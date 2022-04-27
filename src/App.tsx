@@ -1,6 +1,4 @@
-import { useState } from "react";
-import "./App.css";
-import { Button, ConfigProvider, Input, Tabs } from "antd";
+import { Button, ConfigProvider, Tabs } from "antd";
 import { StyleTransform } from "./components/StyleTransform";
 import { TagTransform } from "./components/TagTransform";
 import { GithubOutlined } from "@ant-design/icons";
