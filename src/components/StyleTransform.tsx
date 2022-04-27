@@ -27,6 +27,8 @@ export const StyleTransform = () => {
   const regCalc = /\d+\.?\d*\/\d+\.?\d*/g;
   //匹配注释正则
   const regComment = /\/\*[\s\S]*?\*\//g;
+  // 匹配单行注释正则
+  const regSingleComment = /\/\/.*/g;
   // 当前所有自定义规则列表
   const [ruleList, setRuleList] = useState([]);
   const handleChange = (value: string) => {
@@ -40,6 +42,9 @@ export const StyleTransform = () => {
     });
   };
   const setTransformStyleOutputValue = (inputValue: string) => {
+    if (removeCommentChecked) {
+      inputValue = inputValue.replaceAll(regComment, "").replace(regSingleComment, "");
+    }
     let output = inputValue;
     if (isTransformCalcCss) {
       output = inputValue.replaceAll(regCalc, (match: string) => {
@@ -47,9 +52,7 @@ export const StyleTransform = () => {
         return (Number(num1) / Number(num2)).toFixed(2);
       });
     }
-    if (removeCommentChecked) {
-      output = output.replaceAll(regComment, "");
-    }
+   
     output = output.replace(reg, (match: string) => {
       if (match.startsWith(".")) {
         match = "0" + match;
