@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import { Input, Button, message, Switch, Space} from "antd";
+import { Input, Button, message, Switch, Space } from "antd";
 import CodeMirror from "@uiw/react-codemirror";
 import { css } from "@codemirror/lang-css";
 import { oneDark } from "@codemirror/theme-one-dark";
 import prettier from "prettier/standalone";
 import cssParser from "prettier/parser-postcss";
-
 
 export const StyleTransform = () => {
   const [inputValue, setInputValue] = useState("");
@@ -26,9 +25,9 @@ export const StyleTransform = () => {
   const regCalc = /\d+\.?\d*\/\d+\.?\d*/g;
   //匹配注释正则
   const regComment = /\/\*[\s\S]*?\*\//g;
-  // 匹配单行注释正则
-  const regSingleComment = /\/\/.*/g;
-  
+  // 匹配css单行注释正则 先行断言前面不为非空字符
+  const regSingleComment = /(?<!\S)\/\/.*/g;
+
   const handleChange = (value: string) => {
     setInputValue(value);
     setTransformStyleOutputValue(value);
@@ -41,16 +40,20 @@ export const StyleTransform = () => {
   };
   const setTransformStyleOutputValue = (inputValue: string) => {
     if (removeCommentChecked) {
-      inputValue = inputValue.replaceAll(regComment, "").replace(regSingleComment, "");
+      inputValue = inputValue
+        .replace(regComment, "")
+        .replace(regSingleComment, '');
     }
+    console.log(inputValue);
+
     let output = inputValue;
     if (isTransformCalcCss) {
-      output = inputValue.replaceAll(regCalc, (match: string) => {
+      output = inputValue.replace(regCalc, (match: string) => {
         let [num1, num2] = match.split("/");
         return (Number(num1) / Number(num2)).toFixed(2);
       });
     }
-   
+
     output = output.replace(reg, (match: string) => {
       if (match.startsWith(".")) {
         match = "0" + match;
@@ -78,7 +81,7 @@ export const StyleTransform = () => {
   };
   useEffect(() => {
     setTransformStyleOutputValue(inputValue);
-  }, [isTransformCalcCss, remScale, pxScale]);
+  }, [isTransformCalcCss, remScale, pxScale, removeCommentChecked]);
   return (
     <div>
       <h2>将rem和px单位转换为响应式的rpx单位!</h2>
