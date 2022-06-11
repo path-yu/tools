@@ -33,7 +33,7 @@ export const StyleTransform = () => {
   const regComment = /\/\*[\s\S]*?\*\//g;
   // 匹配css单行注释正则 先行断言前面不为非空字符
   const regSingleComment = /(?<!\S)\/\/.*/g;
-  // 匹配css选择器
+  // 匹配css选择器正则
   const regSelector = /(?<=\s|^)\.\S+/g;
   const handleChange = (value: string) => {
     setInputValue(value);
@@ -52,10 +52,11 @@ export const StyleTransform = () => {
     }
     let transformCase = selectCaseValue ? selectCaseValue : selectCase;
 
-    // 是否将less转为css
     if (isTransformSelector) {
       inputValue = inputValue.replace(regSelector, (match) => {
-        return changeCase[transformCase](match);
+        // 获取选择器前缀
+        const prefix = match.slice(0, 1);
+        return prefix + changeCase[transformCase](match.substring(1));
       });
     }
     let output = inputValue;
