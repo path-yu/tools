@@ -14,6 +14,7 @@
     "@codemirror/theme-one-dark": "^0.19.1",
     "@uiw/react-codemirror": "^4.6.0",
     "antd": "^4.19.5",
+    "change-case": "^4.1.2",
     "normalize.css": "^8.0.1",
     "postcss-less": "^6.0.0",
     "prettier": "^2.6.2",

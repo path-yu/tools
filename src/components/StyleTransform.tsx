@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { Input, Button, message, Switch, Space } from "antd";
+import { Input, Button, message, Switch, Space, Select } from "antd";
 import CodeMirror from "@uiw/react-codemirror";
+import * as changeCase from "change-case";
 import { css } from "@codemirror/lang-css";
 import { oneDark } from "@codemirror/theme-one-dark";
 import prettier from "prettier/standalone";
 import cssParser from "prettier/parser-postcss";
+const { Option } = Select;
+const selectCaseNames = Object.keys(changeCase).filter(item => item.endsWith("Case"));
 
 export const StyleTransform = () => {
   const [inputValue, setInputValue] = useState("");
@@ -17,6 +20,9 @@ export const StyleTransform = () => {
   const [isTransformCalcCss, setIsTransformCalcCss] = useState(true);
   // 是否删除注释代码
   const [removeCommentChecked, setRemoveCommentChecked] = useState(true);
+  // 将selector单词转为snakeCase写法
+  const [isTransformSelector, setIsTransformSelector] = useState(true);
+  const [selectCase, setSelectCase] = useState("snakeCase");
 
   const clipboardObj = navigator.clipboard;
   // 匹配 rem单位或者px单位的正则
@@ -27,25 +33,31 @@ export const StyleTransform = () => {
   const regComment = /\/\*[\s\S]*?\*\//g;
   // 匹配css单行注释正则 先行断言前面不为非空字符
   const regSingleComment = /(?<!\S)\/\/.*/g;
-
+  // 匹配css选择器
+  const regSelector = /(?<=\s|^)\.\S+/g;
   const handleChange = (value: string) => {
     setInputValue(value);
     setTransformStyleOutputValue(value);
   };
-
   const handleCopy = () => {
     clipboardObj.writeText(outputValue).then((r) => {
       message.info("复制成功");
     });
   };
-  const setTransformStyleOutputValue = (inputValue: string) => {
+  const setTransformStyleOutputValue = (inputValue: string,selectCaseValue='snakeCase') => {
     if (removeCommentChecked) {
       inputValue = inputValue
         .replace(regComment, "")
-        .replace(regSingleComment, '');
+        .replace(regSingleComment, "");
     }
-    console.log(inputValue);
+    let transformCase = selectCaseValue ? selectCaseValue : selectCase;
 
+    // 是否将less转为css
+    if (isTransformSelector) {
+      inputValue = inputValue.replace(regSelector, (match) => {
+        return changeCase[transformCase](match);
+      });
+    }
     let output = inputValue;
     if (isTransformCalcCss) {
       output = inputValue.replace(regCalc, (match: string) => {
@@ -79,6 +91,10 @@ export const StyleTransform = () => {
     }
     setOutputValue(output);
   };
+  const handleSelectorCaseChange = (value:string) => {
+    setSelectCase(value);
+    setTransformStyleOutputValue(inputValue,value);
+  }
   useEffect(() => {
     setTransformStyleOutputValue(inputValue);
   }, [isTransformCalcCss, remScale, pxScale, removeCommentChecked]);
@@ -98,6 +114,25 @@ export const StyleTransform = () => {
           checked={removeCommentChecked}
         />
         <span>清除注释代码</span>
+        <Switch
+          style={{ margin: "0 10px" }}
+          onChange={(checked) => setIsTransformSelector(checked)}
+          checked={isTransformSelector}
+        />
+        <div className="ml-2">
+          <span>转换css选择器大小写拼写</span>
+          <Select
+            showSearch
+            placeholder="选择大小写转换方式"
+            optionFilterProp="children"
+            style={{marginLeft: "10px"}}
+            onChange={(value) => handleSelectorCaseChange(value)}
+          >
+            {selectCaseNames.map((item) => {
+              return <Option value={item} key={item}>{item}</Option>;
+            })}
+          </Select>
+        </div>
       </div>
       <div className="flex items-center pt-4">
         <Space>
